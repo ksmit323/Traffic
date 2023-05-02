@@ -1,5 +1,5 @@
 # Traffic Sign Recognition using Supervised Learning
-This repository contains a Python program that uses supervised learning to identify traffic signs in a photograph. The program takes a photograph as input and applies a convolutional neural network to identify traffic signs in the image.
+This repository contains a Python program that uses supervised learning to identify traffic signs in a photograph. The program trains on a dataset and applies a convolutional neural network to classify traffic signs in the images.
 
 ## Installation
 To use the program, you will need to have Python 3.x installed on your computer. You can clone this repository and navigate to the project directory in your terminal or command prompt.
