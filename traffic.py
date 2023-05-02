@@ -58,7 +58,36 @@ def load_data(data_dir):
     be a list of integer labels, representing the categories for each of the
     corresponding `images`.
     """
-    raise NotImplementedError
+    # Initialize lists and variable
+    images = []
+    labels = []
+    label = 0
+
+    # Convert directory into a path/address
+    path = os.path.abspath(data_dir)
+
+    # Make a list of all items in the folder
+    folders = os.listdir(path)
+
+    # Iterate over each folder and convert the items to have a path/address
+    for folder in folders:
+        folder = os.path.join(path, folder)
+        items = os.listdir(folder)
+
+        # Iterate over all items to read in each image
+        for item in items:
+            image = cv2.imread(os.path.join(folder, item), 1)
+            if image is None:
+                print("Image at the below address does not exist:")
+                print(os.path.join(folder, item))
+                sys.exit()
+            else:
+                image = cv2.resize(image, (IMG_WIDTH, IMG_HEIGHT), interpolation=cv2.INTER_LINEAR) # inter_linear is actually the default value so this isn't needed but whatevs
+            images.append(image)
+            labels.append(label)
+        label += 1
+
+    return (images, labels)
 
 
 def get_model():
@@ -67,7 +96,47 @@ def get_model():
     `input_shape` of the first layer is `(IMG_WIDTH, IMG_HEIGHT, 3)`.
     The output layer should have `NUM_CATEGORIES` units, one for each category.
     """
-    raise NotImplementedError
+    # Create neural network
+    model = tf.keras.models.Sequential()
+
+    # Add input layer with rescaling per TF's documentation on "Standardize the data"
+    model.add(tf.keras.layers.Rescaling(1./255, input_shape= (IMG_WIDTH, IMG_HEIGHT, 3)))
+
+    # Add convolution layer
+    model.add(tf.keras.layers.Conv2D(32, (3,3), activation="relu"))
+
+    # Add pooling layer
+    model.add(tf.keras.layers.MaxPooling2D(pool_size=(2,2)))
+
+    # Add another convolution layer
+    #model.add(tf.keras.layers.Conv2D(64, (3,3), activation="relu"))y
+
+    # Add another pooling layer
+    #model.add(tf.keras.layers.MaxPooling2D(pool_size=(2, 2)))
+
+    # Add flattening
+    model.add(tf.keras.layers.Flatten())
+
+    # Add hidden layer
+    model.add(tf.keras.layers.Dense(128, activation="relu"))
+
+    # Add dropout
+    model.add(tf.keras.layers.Dropout(0.4))
+
+    # Add another hidden layer
+    #model.add(tf.keras.layers.Dense(100, activation="relu"))
+
+    # Add output layer with NUM_CATEGORIES and sigmoid activation
+    model.add(tf.keras.layers.Dense(NUM_CATEGORIES, activation="softmax"))
+
+    # Train neural network
+    model.compile(
+        optimizer = "adam",
+        loss = "categorical_crossentropy",
+        metrics = ["accuracy"]
+    )
+
+    return model
 
 
 if __name__ == "__main__":
